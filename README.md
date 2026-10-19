@@ -1,5 +1,7 @@
 # 姑姑生日快乐 · 微信可打开的 H5 祝福页
 
+**线上地址：https://brucebility.github.io/gugu-birthday/**（GitHub Pages，HTTPS）
+
 单文件、零依赖：没有外部图片、字体、音频文件（音效用 Web Audio 现场合成），
 把 `index.html` 传到哪里都能直接打开。
 
