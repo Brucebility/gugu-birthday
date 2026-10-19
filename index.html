@@ -154,33 +154,16 @@ window.CONFIG = {
   }
   @keyframes pill{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}
 
-  /* ---------- 揭晓照片（点蛋糕后弹出） ---------- */
-  .photo-layer{
-    position:fixed;left:0;top:0;right:0;bottom:0;z-index:70;
-    display:flex;flex-direction:column;align-items:center;justify-content:center;
-    padding:24px 20px;background:rgba(56,40,52,.62);
-    -webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);
-    opacity:0;pointer-events:none;
-    transition:opacity .35s ease;
+  /* ---------- 肖像（可选） ---------- */
+  .portrait{
+    margin:34px auto 0;width:100%;max-width:330px;padding:9px 9px 0;
+    background:rgba(255,255,255,.96);border-radius:22px;
+    box-shadow:0 18px 42px rgba(120,80,110,.20);
+    transform:rotate(-1.2deg);
   }
-  .photo-layer.in{opacity:1;pointer-events:auto}
-  .photo-card{
-    margin:0;padding:10px 10px 0;background:#fff;border-radius:20px;
-    box-shadow:0 24px 60px rgba(40,20,35,.42);
-    transform:translateY(20px) scale(.9);
-    transition:transform .45s cubic-bezier(.22,1,.36,1);
-  }
-  .photo-layer.in .photo-card{transform:none}
-  .photo-card img{display:block;width:auto;max-width:100%;max-height:64vh;height:auto;border-radius:14px;background:#f6eef2}
-  .photo-card figcaption{padding:12px 6px 13px;text-align:center;font-size:13px;color:#8a7489;letter-spacing:.06em}
-  .photo-tip{margin:16px 0 0;color:rgba(255,255,255,.85);font-size:12.5px;letter-spacing:.1em}
-
-  .peek{
-    display:inline-flex;align-items:center;gap:6px;margin-top:12px;padding:9px 17px;
-    border-radius:999px;border:0;background:#ffe0ec;color:#c9407a;
-    font-size:13px;font-weight:600;font-family:inherit;cursor:pointer;
-    box-shadow:0 8px 20px rgba(255,120,160,.25);
-  }
+  .portrait-frame{border-radius:14px;overflow:hidden;background:#f6eef2}
+  .portrait img{display:block;width:100%;height:auto}
+  .portrait figcaption{padding:12px 6px 14px;text-align:center;font-size:13px;color:var(--muted);letter-spacing:.06em}
 
   /* ---------- 祝福列表 ---------- */
   .section-title{
@@ -344,8 +327,14 @@ window.CONFIG = {
       </svg>
     </div>
     <button class="hint" id="hint" type="button">👆 轻点蛋糕，许个愿</button>
-    <button class="peek" id="peekBtn" type="button" hidden>📸 再看一眼照片</button>
   </section>
+
+  <figure class="portrait" id="portrait">
+    <div class="portrait-frame">
+      <img id="auntPhoto" src="aunt.jpg" alt="姑姑的生日肖像" loading="lazy" decoding="async">
+    </div>
+    <figcaption id="portraitCaption">本人认证 · 永远十八岁</figcaption>
+  </figure>
 
   <h2 class="section-title">今日份的祝福</h2>
   <div class="wishes" id="wishes"></div>
@@ -355,14 +344,6 @@ window.CONFIG = {
     <p class="made">🎈 生日快乐 · 天天开心</p>
   </footer>
 </main>
-
-<div class="photo-layer" id="photoLayer" hidden>
-  <figure class="photo-card">
-    <img id="auntPhoto" src="aunt.jpg" alt="姑姑的生日肖像" decoding="async">
-    <figcaption id="portraitCaption">本人认证 · 永远十八岁</figcaption>
-  </figure>
-  <p class="photo-tip">轻点任意处关闭</p>
-</div>
 
 <script>
 (function () {
@@ -377,13 +358,11 @@ window.CONFIG = {
   $('sub').textContent = C.subtitle || '';
   $('sign').textContent = C.signature || '';
 
-  /* ---------- 照片：点蛋糕后才揭晓 ---------- */
-  var layer = $('photoLayer');
-  if (!C.portrait) {
-    layer.hidden = true;
-  } else {
-    $('auntPhoto').src = C.portrait;
+  /* ---------- 可选肖像 ---------- */
+  if (C.portrait) {
     if (C.portraitCaption) { $('portraitCaption').textContent = C.portraitCaption; }
+  } else {
+    $('portrait').hidden = true;
   }
 
   /* ---------- 祝福卡片 ---------- */
@@ -566,7 +545,7 @@ window.CONFIG = {
   function blowOut() {
     blown = true;
     cakeWrap.classList.add('blown');
-    hint.textContent = '🎉 愿望已发货 · 照片也到了';
+    hint.textContent = '🎉 愿望已发货，请签收';
     var c = cakeCenter();
     burst(c.x, c.y, 60, 1.25);
     setTimeout(function () { burst(c.x - 40, c.y - 10, 30, 1); }, 130);
@@ -576,27 +555,6 @@ window.CONFIG = {
     tone(783.99, .2, .28, 'triangle', .1);
     tone(1046.5, .3, .5, 'triangle', .11);
     if (navigator.vibrate) { try { navigator.vibrate(30); } catch (e) {} }
-    setTimeout(openPhoto, 520);
-  }
-
-  /* 吹完蜡烛，把照片弹出来 */
-  function openPhoto() {
-    if (!C.portrait || !layer) return;
-    $('peekBtn').hidden = false;
-    document.documentElement.style.overflow = 'hidden';
-    layer.hidden = false;
-    requestAnimationFrame(function () {
-      requestAnimationFrame(function () { layer.classList.add('in'); });
-    });
-    tone(783.99, 0, .3, 'sine', .06);
-    tone(1046.5, .1, .4, 'sine', .05);
-  }
-
-  function closePhoto() {
-    if (!layer || layer.hidden) return;
-    layer.classList.remove('in');
-    document.documentElement.style.overflow = '';
-    setTimeout(function () { layer.hidden = true; }, 380);
   }
 
   function relight() {
@@ -619,15 +577,6 @@ window.CONFIG = {
   hint.addEventListener('click', function (e) {
     e.stopPropagation();
     toggleCake();
-  });
-
-  layer.addEventListener('click', closePhoto);
-  document.addEventListener('keydown', function (e) {
-    if (e.key === 'Escape') { closePhoto(); }
-  });
-  $('peekBtn').addEventListener('click', function () {
-    ensureAudio();
-    openPhoto();
   });
 
   /* ---------- 点气球 ---------- */
