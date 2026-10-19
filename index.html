@@ -2,8 +2,8 @@
 <!--
   姑姑生日快乐 · 微信可打开的 H5 祝福页
   ------------------------------------------------------------
-  改内容：只改下面 <script> 里的 window.CONFIG（名字 / 祝福语 / 落款 / 照片）
-  加照片：把照片放在本文件同目录，photo 写 'aunt.jpg'
+  改内容：只改下面 <script> 里的 window.CONFIG（名字 / 祝福语 / 落款 / 肖像）
+  换肖像：把图片放同目录，portrait 写 'aunt.jpg'
   交互：点蛋糕吹蜡烛（再点一次重新点亮）、点气球炸开、点祝福卡片抖动
   音效：右下角按钮开关（浏览器要求先点一下页面才会出声）
 -->
@@ -22,7 +22,8 @@ window.CONFIG = {
   title: '姑姑，生日快乐！',
   subtitle: '今天您说什么都对 · 想吃几块蛋糕就吃几块',
   signature: '—— 您最懂事的侄子',
-  photo: '',   /* 例如 'aunt.jpg'（图片放同目录）；留空则不显示照片框 */
+  portrait: 'aunt.jpg',   /* 肖像图，放同目录；留空则不显示 */
+  portraitCaption: '本人认证 · 永远十八岁',
   wishes: [
     { emoji: '🎂', text: '生日快乐！今天您说什么都对，蛋糕想吃几块就吃几块，谁劝都不好使。' },
     { emoji: '💰', text: '祝您的钱包和笑容一样，只涨不跌，长期飘红。' },
@@ -153,15 +154,16 @@ window.CONFIG = {
   }
   @keyframes pill{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}
 
-  /* ---------- 照片（可选） ---------- */
-  .polaroid{
-    margin:30px auto 0;width:min(300px,82vw);padding:10px 10px 0;
-    background:#fff;border-radius:10px;
-    box-shadow:0 14px 30px rgba(120,80,110,.18);
-    transform:rotate(-1.6deg);
+  /* ---------- 肖像（可选） ---------- */
+  .portrait{
+    margin:34px auto 0;width:100%;max-width:330px;padding:9px 9px 0;
+    background:rgba(255,255,255,.96);border-radius:22px;
+    box-shadow:0 18px 42px rgba(120,80,110,.20);
+    transform:rotate(-1.2deg);
   }
-  .polaroid img{display:block;width:100%;border-radius:6px;background:#f6eef2}
-  .polaroid figcaption{padding:12px 4px 14px;text-align:center;font-size:13px;color:var(--muted);letter-spacing:.04em}
+  .portrait-frame{border-radius:14px;overflow:hidden;background:#f6eef2}
+  .portrait img{display:block;width:100%;height:auto}
+  .portrait figcaption{padding:12px 6px 14px;text-align:center;font-size:13px;color:var(--muted);letter-spacing:.06em}
 
   /* ---------- 祝福列表 ---------- */
   .section-title{
@@ -327,9 +329,11 @@ window.CONFIG = {
     <button class="hint" id="hint" type="button">👆 轻点蛋糕，许个愿</button>
   </section>
 
-  <figure class="polaroid" id="polaroid" hidden>
-    <img id="auntPhoto" alt="姑姑的照片">
-    <figcaption>永远十八岁的那位女士</figcaption>
+  <figure class="portrait" id="portrait">
+    <div class="portrait-frame">
+      <img id="auntPhoto" src="aunt.jpg" alt="姑姑的生日肖像" loading="lazy" decoding="async">
+    </div>
+    <figcaption id="portraitCaption">本人认证 · 永远十八岁</figcaption>
   </figure>
 
   <h2 class="section-title">今日份的祝福</h2>
@@ -354,10 +358,11 @@ window.CONFIG = {
   $('sub').textContent = C.subtitle || '';
   $('sign').textContent = C.signature || '';
 
-  /* ---------- 可选照片 ---------- */
-  if (C.photo) {
-    $('auntPhoto').src = C.photo;
-    $('polaroid').hidden = false;
+  /* ---------- 可选肖像 ---------- */
+  if (C.portrait) {
+    if (C.portraitCaption) { $('portraitCaption').textContent = C.portraitCaption; }
+  } else {
+    $('portrait').hidden = true;
   }
 
   /* ---------- 祝福卡片 ---------- */
